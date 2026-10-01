@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 
 import { SeriesForm } from '@/components/series-form';
@@ -6,6 +6,7 @@ import { Screen } from '@/components/ui';
 import { isActivityKind } from '@/domain/activity-types';
 import { formatDate } from '@/domain/format';
 import { useAppData, useSnapshot } from '@/state/app-data';
+import { closeScreen } from '@/components/navigation';
 
 export default function NewSeries() {
   const s = useSnapshot();
@@ -24,7 +25,7 @@ export default function NewSeries() {
           onSubmit={async (input) => {
             const res = await act((r) => r.createSeries(input));
             if (!res) return;
-            router.back();
+            closeScreen();
             showToast(`Reminder set for ${formatDate(input.startDate, s.today)}`);
             // Ask for permission right after the user has chosen a reminder, never before.
             if (permission?.state === 'undetermined' && permission.canAskAgain) await requestPermission();

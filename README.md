@@ -107,3 +107,11 @@ src/
 ```
 
 The database is the source of truth. After every change the app works out which alerts should exist and reconciles the operating system's schedule to match. It also does this whenever the app comes to the foreground, which recovers from dropped or stale alerts.
+
+## Browser preview
+
+```bash
+npm run web       # http://localhost:8081
+```
+
+The browser preview runs the same screens, rules and SQLite database as the phone app. Data stays in that browser. Notifications only work in the phone builds, so the preview skips the permission step and says so on Today. `metro.config.js` adds the headers SQLite needs in the browser.

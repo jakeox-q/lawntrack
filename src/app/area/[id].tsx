@@ -1,11 +1,13 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, View } from 'react-native';
 
 import { Button, ChipGroup, Field, FieldLabel, parseNumber, Screen, Text } from '@/components/ui';
 import { space } from '@/constants/theme';
 import { GRASS_TYPES } from '@/domain/activity-types';
 import { useAppData, useSnapshot } from '@/state/app-data';
+import { showDialog } from '@/components/dialog';
+import { closeScreen } from '@/components/navigation';
 
 const NOT_SURE = 'Not sure';
 
@@ -28,7 +30,7 @@ export default function AreaScreen() {
     const input = { name, sizeM2, grassType: grass === NOT_SURE ? null : grass, notes };
     const ok = await run((r) => (area ? r.updateArea(area.id, input) : r.createArea(input)));
     if (!ok) return;
-    router.back();
+    closeScreen();
     showToast(area ? 'Area updated' : 'Area added');
   };
 
@@ -57,7 +59,7 @@ export default function AreaScreen() {
             variant="danger"
             label="Remove area"
             onPress={() =>
-              Alert.alert(
+              showDialog(
                 `Remove ${area.name}?`,
                 `${reminders ? `Its ${reminders} reminder${reminders === 1 ? '' : 's'} will be deleted. ` : ''}Logged work stays in History.`,
                 [
@@ -67,7 +69,7 @@ export default function AreaScreen() {
                     style: 'destructive',
                     onPress: async () => {
                       if (!(await run((r) => r.deleteArea(area.id)))) return;
-                      router.back();
+                      closeScreen();
                       showToast('Area removed');
                     },
                   },

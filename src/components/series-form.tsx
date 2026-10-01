@@ -143,7 +143,7 @@ export function SeriesForm({
           />
           <ChipGroup
             label="How often"
-            options={[...INTERVALS.map((d) => ({ value: d, label: intervalLabel(d).replace('every ', '') })), { value: CUSTOM, label: 'Custom' }]}
+            options={[...INTERVALS.map((d) => ({ value: d, label: d === 7 ? '1 week' : intervalLabel(d).replace('every ', '') })), { value: CUSTOM, label: 'Custom' }]}
             value={interval}
             onChange={setInterval}
           />

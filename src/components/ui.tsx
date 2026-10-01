@@ -42,7 +42,7 @@ export function Icon({ name, size = 22, color }: { name: IconName; size?: number
   const theme = useTheme();
   return (
     <SymbolView
-      name={{ ios: name.ios as SFSymbol, android: name.android as AndroidSymbol }}
+      name={{ ios: name.ios as SFSymbol, android: name.android as AndroidSymbol, web: name.android as AndroidSymbol }}
       size={size}
       tintColor={color ?? theme.text}
       accessibilityElementsHidden

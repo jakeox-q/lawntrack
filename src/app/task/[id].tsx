@@ -1,5 +1,5 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
 
 import { CHECK, DuePill, taskSubtitle } from '@/components/tasks';
 import { Banner, Button, Card, ChipGroup, EmptyState, FieldLabel, IconBadge, Row, Screen, Section, Text } from '@/components/ui';
@@ -11,6 +11,8 @@ import { explainRule, formatArea, formatDate, formatTime } from '@/domain/format
 import { snoozeChoices } from '@/domain/snooze';
 import { useAppData, useSnapshot } from '@/state/app-data';
 import { usePickers } from '@/state/pickers';
+import { showDialog } from '@/components/dialog';
+import { closeScreen } from '@/components/navigation';
 
 export default function TaskDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -43,12 +45,12 @@ export default function TaskDetail() {
   const choices = snoozeChoices(new Date(), s.timeZone, series.reminderTime);
 
   const done = async () => {
-    if (await completeTask(occurrence.id)) router.back();
+    if (await completeTask(occurrence.id)) closeScreen();
   };
 
   const doneOtherDay = async () => {
     const date = await pickDate({ title: 'When did you do it?', value: s.today, max: s.today });
-    if (date && (await completeTask(occurrence.id, date))) router.back();
+    if (date && (await completeTask(occurrence.id, date))) closeScreen();
   };
 
   const reschedule = async () => {
@@ -61,14 +63,14 @@ export default function TaskDetail() {
     const doSkip = async (next: string | null) => {
       const res = await act((r) => r.skipOccurrence(occurrence.id, next));
       if (!res) return;
-      router.back();
+      closeScreen();
       const msg = res.paused ? 'Skipped · reminder paused' : res.successorDue ? `Skipped · next ${formatDate(res.successorDue, s.today)}` : 'Skipped';
       showToast(msg, async () => {
         await act((r) => r.reopenOccurrence(occurrence.id));
       });
     };
     if (series.mode === 'after_completion') {
-      Alert.alert(
+      showDialog(
         'Skip this time?',
         'This reminder counts from when you do the job, so nothing will be recorded. Choose when to be reminded next, or pause it.',
         [
@@ -84,7 +86,7 @@ export default function TaskDetail() {
         ],
       );
     } else {
-      Alert.alert('Skip this time?', series.mode === 'once' ? 'This one-off reminder will close without being recorded.' : 'Nothing is recorded. Later dates stay the same.', [
+      showDialog('Skip this time?', series.mode === 'once' ? 'This one-off reminder will close without being recorded.' : 'Nothing is recorded. Later dates stay the same.', [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Skip', style: 'destructive', onPress: () => void doSkip(null) },
       ]);
@@ -146,7 +148,7 @@ export default function TaskDetail() {
       <Section title="Not today?">
         <ChipGroup
           label="Snooze reminder"
-          options={choices.map((c) => ({ value: c.key as string, label: `Remind ${c.label.toLowerCase()}` }))}
+          options={choices.map((c) => ({ value: c.key as string, label: `Remind ${c.label}` }))}
           value={undefined}
           onChange={async (key) => {
             const c = choices.find((x) => x.key === key)!;

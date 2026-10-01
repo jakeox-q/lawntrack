@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 
 import { ActivityForm } from '@/components/activity-form';
@@ -6,6 +6,7 @@ import { Screen } from '@/components/ui';
 import { activityType, isActivityKind } from '@/domain/activity-types';
 import { formatDate } from '@/domain/format';
 import { useAppData, useSnapshot } from '@/state/app-data';
+import { closeScreen } from '@/components/navigation';
 
 export default function LogScreen() {
   const s = useSnapshot();
@@ -25,7 +26,7 @@ export default function LogScreen() {
           onSubmit={async (input, link) => {
             const res = await act((r) => r.logActivity(input, link));
             if (!res) return;
-            router.back();
+            closeScreen();
             const next = res.successorDue ? ` · next ${formatDate(res.successorDue, s.today)}` : '';
             showToast(`${activityType(input.kind).done}${next}`, async () => {
               await act((r) => r.deleteActivity(res.activityId!));

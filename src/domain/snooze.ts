@@ -2,6 +2,7 @@ import { addDays, type LocalTime, nextWeekday, todayIn, weekday, zonedDateTimeTo
 
 export interface SnoozeChoice {
   key: 'later' | 'tomorrow' | 'weekend';
+  /** Reads after "Remind me": "in 3 hours", "tomorrow", "Saturday". */
   label: string;
   until: Date;
 }
@@ -13,8 +14,8 @@ export function snoozeChoices(now: Date, timeZone: string, reminderTime: LocalTi
   const day = weekday(today);
   const saturday = day === 6 || day === 0 ? nextWeekday(today, 6) : nextWeekday(today, 6, true);
   return [
-    { key: 'later', label: 'In 3 hours', until: new Date(now.getTime() + 3 * 3600_000) },
-    { key: 'tomorrow', label: 'Tomorrow', until: new Date(tomorrow) },
+    { key: 'later', label: 'in 3 hours', until: new Date(now.getTime() + 3 * 3600_000) },
+    { key: 'tomorrow', label: 'tomorrow', until: new Date(tomorrow) },
     { key: 'weekend', label: 'Saturday', until: new Date(zonedDateTimeToInstant(saturday, reminderTime, timeZone)) },
   ];
 }

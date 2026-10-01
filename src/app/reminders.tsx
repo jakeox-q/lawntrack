@@ -1,4 +1,4 @@
-import { Alert, Linking, View } from 'react-native';
+import { Linking, Platform, View } from 'react-native';
 
 import { TimeChoice } from '@/components/choices';
 import { Banner, Button, Card, FieldLabel, Row, Screen, Section, Text } from '@/components/ui';
@@ -7,6 +7,7 @@ import { instantToLocalDate, instantToLocalTime } from '@/domain/dates';
 import { formatDate, formatTime } from '@/domain/format';
 import { sendTestNotification } from '@/notifications/native';
 import { useAppData, useSnapshot } from '@/state/app-data';
+import { showDialog } from '@/components/dialog';
 
 export default function RemindersScreen() {
   const s = useSnapshot();
@@ -16,7 +17,14 @@ export default function RemindersScreen() {
 
   return (
     <Screen>
-      {granted ? (
+      {Platform.OS === 'web' ? (
+        <Banner
+          tone="info"
+          icon={{ ios: 'iphone', android: 'smartphone' }}
+          title="Notifications need the phone app"
+          body="This browser preview shows your plan and history but can’t send reminders. Install the iPhone or Android build to get them."
+        />
+      ) : granted ? (
         <Banner tone="primary" icon={{ ios: 'bell.fill', android: 'notifications' }} title="Reminders are on" body="You’ll get a notification at each reminder’s time." />
       ) : (
         <Banner
@@ -72,7 +80,7 @@ export default function RemindersScreen() {
               await sendTestNotification(5);
               showToast('Test sent · it arrives in 5 seconds');
             } catch {
-              Alert.alert('Couldn’t send a test', 'Check that notifications are allowed for this app.');
+              showDialog('Couldn’t send a test', 'Check that notifications are allowed for this app.');
             }
           }}
         />

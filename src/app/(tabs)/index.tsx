@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 
 import { CHECK, DuePill, TaskRow, taskSubtitle } from '@/components/tasks';
 import { Banner, Button, Card, EmptyState, IconBadge, Row, Screen, Section, Text } from '@/components/ui';
@@ -24,7 +24,14 @@ export default function TodayScreen() {
 
   return (
     <Screen tabScreen title="Today" subtitle={`${DAY_NAMES[weekday(s.today)]} ${formatDate(s.today).slice(4)}`}>
-      {s.tasks.length > 0 && permission && permission.state !== 'granted' ? (
+      {Platform.OS === 'web' ? (
+        <Banner
+          tone="info"
+          icon={{ ios: 'iphone', android: 'smartphone' }}
+          title="Browser preview"
+          body="Everything works here except notifications, which need the iPhone or Android app. Your data stays in this browser."
+        />
+      ) : s.tasks.length > 0 && permission && permission.state !== 'granted' ? (
         <Banner
           tone="info"
           icon={{ ios: 'bell.slash', android: 'notifications_off' }}

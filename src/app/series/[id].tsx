@@ -1,11 +1,13 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { Alert, KeyboardAvoidingView, Platform, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, View } from 'react-native';
 
 import { SeriesForm } from '@/components/series-form';
 import { Banner, Button, EmptyState, Screen } from '@/components/ui';
 import { space } from '@/constants/theme';
 import { useAppData, useSnapshot } from '@/state/app-data';
 import { usePickers } from '@/state/pickers';
+import { showDialog } from '@/components/dialog';
+import { closeScreen } from '@/components/navigation';
 
 export default function EditSeries() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -44,7 +46,7 @@ export default function EditSeries() {
           submitLabel="Save changes"
           onSubmit={async (input) => {
             if (!(await run((r) => r.updateSeries(series.id, input)))) return;
-            router.back();
+            closeScreen();
             showToast('Reminder updated');
           }}
         />
@@ -62,7 +64,7 @@ export default function EditSeries() {
             variant="danger"
             label="Delete reminder"
             onPress={() =>
-              Alert.alert('Delete this reminder?', 'Future reminders stop. Work you have already logged stays in History.', [
+              showDialog('Delete this reminder?', 'Future reminders stop. Work you have already logged stays in History.', [
                 { text: 'Cancel', style: 'cancel' },
                 {
                   text: 'Delete',

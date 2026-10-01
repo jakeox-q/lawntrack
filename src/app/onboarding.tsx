@@ -47,7 +47,9 @@ export default function Onboarding() {
     const res = await act((r) => r.createSeries(input));
     if (res) {
       setCreatedReminder(true);
-      setStep('notify');
+      // Browsers can't receive these reminders, so the preview goes straight to Today.
+      if (Platform.OS === 'web') await finish();
+      else setStep('notify');
     }
   };
 

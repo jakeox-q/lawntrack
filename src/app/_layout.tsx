@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { DialogHost } from '@/components/dialog';
 import { Toast } from '@/components/toast';
 import { Button, Text } from '@/components/ui';
 import { space } from '@/constants/theme';
@@ -77,6 +78,7 @@ function Navigation() {
         <Stack.Screen name="reminders" options={{ title: 'Reminders' }} />
       </Stack>
       <Toast />
+      <DialogHost />
     </ThemeProvider>
   );
 }

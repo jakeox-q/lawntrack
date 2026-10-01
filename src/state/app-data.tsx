@@ -4,7 +4,7 @@ import { getCalendars } from 'expo-localization';
 import { router } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, AppState } from 'react-native';
+import { AppState, Platform } from 'react-native';
 
 import { createRepo, type Repo, RepoError } from '@/data/repo';
 import type { ActivityDetails, Snapshot } from '@/data/types';
@@ -25,6 +25,7 @@ import {
   type SyncResult,
   syncNotifications,
 } from '@/notifications/native';
+import { showDialog } from '@/components/dialog';
 
 export function deviceTimeZone(): string {
   try {
@@ -156,10 +157,10 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         return result;
       } catch (e) {
         if (e instanceof RepoError) {
-          Alert.alert('Check this', e.message);
+          showDialog('Check this', e.message);
         } else {
           console.error(e);
-          Alert.alert('Something went wrong', 'Your change was not saved. Please try again.');
+          showDialog('Something went wrong', 'Your change was not saved. Please try again.');
         }
         await refresh();
         return undefined;
@@ -189,11 +190,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         showToast('Already done');
         return true;
       }
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      if (Platform.OS !== 'web') void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       const next = result.successorDue ? ` · next ${formatDate(result.successorDue, today)}` : '';
       showToast(`Done${next}`, async () => {
         const ok = await act((r) => r.reopenOccurrence(occurrenceId));
-        if (ok === false) Alert.alert('Can’t undo', 'The next reminder has already been changed. Edit the entry in History instead.');
+        if (ok === false) showDialog('Can’t undo', 'The next reminder has already been changed. Edit the entry in History instead.');
       });
       return true;
     },
@@ -202,7 +203,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
 
   const snoozeTask = useCallback(
     async (occurrenceId: string, until: Date, label: string) => {
-      if (await run((r) => r.snoozeOccurrence(occurrenceId, until))) showToast(`Reminder moved to ${label.toLowerCase()}`);
+      if (await run((r) => r.snoozeOccurrence(occurrenceId, until))) showToast(`Snoozed · reminding you ${label}`);
     },
     [run, showToast],
   );

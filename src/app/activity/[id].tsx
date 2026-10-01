@@ -1,9 +1,11 @@
-import { router, useLocalSearchParams } from 'expo-router';
-import { Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { KeyboardAvoidingView, Platform } from 'react-native';
 
 import { ActivityForm } from '@/components/activity-form';
 import { Banner, Button, EmptyState, Screen } from '@/components/ui';
 import { useAppData, useSnapshot } from '@/state/app-data';
+import { showDialog } from '@/components/dialog';
+import { closeScreen } from '@/components/navigation';
 
 export default function EditActivity() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -38,7 +40,7 @@ export default function EditActivity() {
           submitLabel="Save changes"
           onSubmit={async (input) => {
             if (!(await run((r) => r.updateActivity(activity.id, input)))) return;
-            router.back();
+            closeScreen();
             showToast('Entry updated');
           }}
         />
@@ -46,7 +48,7 @@ export default function EditActivity() {
           variant="danger"
           label="Delete entry"
           onPress={() =>
-            Alert.alert(
+            showDialog(
               'Delete this entry?',
               activity.seriesId ? 'If it was the latest time you did this job, the reminder will be recalculated.' : 'This cannot be undone.',
               [
@@ -57,7 +59,7 @@ export default function EditActivity() {
                   onPress: async () => {
                     const res = await act((r) => r.deleteActivity(activity.id));
                     if (!res) return;
-                    router.back();
+                    closeScreen();
                     showToast(res.reopened ? 'Entry deleted · task reopened' : 'Entry deleted');
                   },
                 },

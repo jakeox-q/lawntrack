@@ -53,7 +53,7 @@ it('takes a new user from sign-up-free onboarding to a scheduled, completable re
   // Snooze from the task screen moves the alert, keeps the job due today, and confirms.
   fireEvent.press(screen.getByRole('button', { name: 'Options' }));
   fireEvent.press(await screen.findByRole('radio', { name: 'Remind tomorrow' }));
-  expect(await screen.findByText('Reminder moved to tomorrow')).toBeTruthy();
+  expect(await screen.findByText('Snoozed · reminding you tomorrow')).toBeTruthy();
   expect(screen.getAllByText(/reminder snoozed to/).length).toBeGreaterThan(0);
   expect(screen.getAllByText('Due today').length).toBeGreaterThan(0);
 });
